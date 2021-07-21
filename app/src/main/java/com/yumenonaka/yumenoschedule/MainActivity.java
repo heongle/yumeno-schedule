@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressWarnings({"BusyWait"})
     private void animateLoadingScreen() {
         Thread thread = new Thread(()->{
             ImageView loadingView = findViewById(R.id.loadingView);
@@ -103,11 +104,15 @@ public class MainActivity extends AppCompatActivity {
             };
             while(isLoading) {
                 for(int i = 0; i < 4; ++i) {
-                    loadingView.setImageBitmap(imgs[i]);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if(isLoading) {
+                        loadingView.setImageBitmap(imgs[i]);
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        break;
                     }
                 }
             }
