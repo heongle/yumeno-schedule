@@ -21,7 +21,6 @@ import org.json.JSONObject;
 import com.yumenonaka.yumenoschedule.apis.YumenoApis;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
