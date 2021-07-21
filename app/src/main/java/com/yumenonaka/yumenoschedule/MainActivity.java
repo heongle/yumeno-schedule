@@ -3,11 +3,14 @@ package com.yumenonaka.yumenoschedule;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +21,7 @@ import org.json.JSONObject;
 import com.yumenonaka.yumenoschedule.apis.YumenoApis;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,11 +29,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
+    private boolean isLoading = true;
     private ViewGroup mainLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.spinner);
+        setContentView(R.layout.loading);
+        animateLoadingScreen();
         initialize();
     }
 
@@ -42,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 LinkedHashMap<String, ArrayList<JSONObject>> parsedData = parseScheduleData(data);
                 List<String> dateKeySet = new ArrayList<>(parsedData.keySet());
                 runOnUiThread(()->{
+                    isLoading = false;
                     setContentView(R.layout.activity_main);
                     mainLayout = findViewById(R.id.mainLayout);
                     LayoutInflater inflater = getLayoutInflater();
@@ -83,6 +90,29 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void animateLoadingScreen() {
+        Thread thread = new Thread(()->{
+            ImageView loadingView = findViewById(R.id.loadingView);
+            Bitmap[] imgs = {
+                    BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_1)),
+                    BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_2)),
+                    BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_3)),
+                    BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_4))
+            };
+            while(isLoading) {
+                for(int i = 0; i < 4; ++i) {
+                    loadingView.setImageBitmap(imgs[i]);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        thread.start();
     }
 
     @NotNull

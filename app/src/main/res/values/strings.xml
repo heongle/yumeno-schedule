@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Yumeno Schedule</string>
+    <string name="loading">Loading Image</string>
 </resources>
