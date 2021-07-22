@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity {
     private boolean isLoading = true;
     private ViewGroup mainLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressWarnings({"BusyWait"})
     private void animateLoadingScreen() {
-        Thread thread = new Thread(()->{
+        Thread loadingThread = new Thread(() -> {
             ImageView loadingView = findViewById(R.id.loadingView);
             Bitmap[] imgs = {
                     BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_1)),
@@ -101,10 +102,13 @@ public class MainActivity extends AppCompatActivity {
                     BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_3)),
                     BitmapFactory.decodeStream(this.getResources().openRawResource(R.raw.load_4))
             };
-            while(isLoading) {
-                for(int i = 0; i < 4; ++i) {
-                    if(isLoading) {
-                        loadingView.setImageBitmap(imgs[i]);
+            while (isLoading) {
+                for (int i = 0; i < 4; ++i) {
+                    if (isLoading) {
+                        int finalI = i;
+                        runOnUiThread(() -> {
+                            loadingView.setImageBitmap(imgs[finalI]);
+                        });
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -116,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        thread.start();
+        loadingThread.start();
     }
 
     @NotNull
@@ -125,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
         LinkedHashMap<String, ArrayList<JSONObject>> parsedData = new LinkedHashMap<>(); // Prepare the map to store processed data
         ArrayList<JSONObject> items = new ArrayList<>(); // The array list to store list of schedule for particular date (same date)
         items.add(data.getJSONObject(0)); // Add first element
-
         for(int i = 1; i < data.length(); ++i) {
             String newDate = data.getJSONObject(i).getString("eventDate");
             if(!curDate.equals(newDate)) {
