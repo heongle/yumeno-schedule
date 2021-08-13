@@ -33,14 +33,6 @@ public class MainActivity extends AppCompatActivity {
     private ViewGroup mainLayout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.loading);
-        animateLoadingScreen();
-        initialize();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         isLoading = true;
