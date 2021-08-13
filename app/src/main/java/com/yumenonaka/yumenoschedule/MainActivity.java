@@ -2,6 +2,7 @@ package com.yumenonaka.yumenoschedule;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
         initialize();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isLoading = true;
+        setContentView(R.layout.loading);
+        animateLoadingScreen();
+        initialize();
+    }
+
     private void initialize() {
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(()->{
@@ -50,6 +60,15 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(()->{
                     isLoading = false;
                     setContentView(R.layout.activity_main);
+                    SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+                    swipeRefreshLayout.setOnRefreshListener(()->{
+                        isLoading = true;
+                        setContentView(R.layout.loading);
+                        animateLoadingScreen();
+                        swipeRefreshLayout.setRefreshing(false);
+                        initialize();
+                    });
+
                     mainLayout = findViewById(R.id.mainLayout);
                     LayoutInflater inflater = getLayoutInflater();
 
@@ -110,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                             loadingView.setImageBitmap(imgs[finalI]);
                         });
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(250);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
