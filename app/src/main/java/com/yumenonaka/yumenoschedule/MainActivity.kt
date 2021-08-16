@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.yumenonaka.yumenoschedule.apis.YumenoApis
+import com.yumenonaka.yumenoschedule.utility.CommonUtility
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import org.json.JSONArray
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         executor.execute {
             val response: String = YumenoApis.getRecentSchedule()
             val data: JSONArray = JSONObject(response).getJSONArray("data")
-            val parsedData: LinkedHashMap<String, ArrayList<JSONObject>> = parseScheduleData(data)
+            val parsedData: LinkedHashMap<String, ArrayList<JSONObject>> = CommonUtility.parseScheduleData(data)
             val dateKeySet: List<String> = ArrayList(parsedData.keys)
             runOnUiThread {
                 isLoading = false
@@ -91,9 +92,7 @@ class MainActivity : AppCompatActivity() {
             )
             while (isLoading) {
                 for (i in 0..3) {
-                    if (!isLoading) {
-                        break
-                    }
+                    if (!isLoading) break
                     runOnUiThread {
                         loadingView.setImageBitmap(imgs[i])
                     }
@@ -102,24 +101,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
         loadingThread.start()
-    }
-
-    private fun parseScheduleData(data: JSONArray): LinkedHashMap<String, ArrayList<JSONObject>> {
-        var curDate: String = data.getJSONObject(0).getString("eventDate") // Get the first element date
-        val parsedData: LinkedHashMap<String, ArrayList<JSONObject>> = LinkedHashMap() // Prepare the map to store processed data
-        val items: ArrayList<JSONObject> = ArrayList() // The array list to store list of schedule for particular date (same date)
-        items.add(data.getJSONObject(0)) // Add first element
-        for (i in 1 until data.length()) {
-            val newDate = data.getJSONObject(i).getString("eventDate")
-            if (curDate != newDate) {
-                parsedData[curDate] = ArrayList(items) // if date changed then put all the schedule items into the corresponding date
-                curDate = newDate // date changed so update the current date
-                items.clear() // clear the items if date changed
-            }
-            items.add(data.getJSONObject(i))
-        }
-        parsedData[curDate] = ArrayList(items) // Add the last schedule item into the map
-
-        return parsedData
     }
 }
