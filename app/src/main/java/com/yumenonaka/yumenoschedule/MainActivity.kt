@@ -69,11 +69,12 @@ class MainActivity : AppCompatActivity() {
                         val desc: TextView = scheduleListBtn.findViewById(R.id.scheduleDescription)
                         val scheduleTime: String = if(scheduleItems[j].has("startTime")) scheduleItems[j].getString("startTime") + "  " else ""
                         val scheduleTitle: String = scheduleTime + scheduleItems[j].getString("eventName")
+                        val scheduleDescription: String = if(scheduleItems[j].has("description")) scheduleItems[j].getString("description") else "N/A"
                         btn.text = scheduleTitle
                         btn.setOnClickListener {
                             desc.visibility = if (desc.visibility == View.VISIBLE) View.GONE else View.VISIBLE
                         }
-                        desc.text = HtmlCompat.fromHtml(scheduleItems[j].getString("description"), HtmlCompat.FROM_HTML_MODE_COMPACT)
+                        desc.text = HtmlCompat.fromHtml(scheduleDescription, HtmlCompat.FROM_HTML_MODE_COMPACT)
                         mainLayout.addView(scheduleListBtn)
                     }
                 }
